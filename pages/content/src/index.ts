@@ -6,28 +6,45 @@ if (location.hostname === 'chatgpt.com') {
 
   let notify = false;
   let prevExists = false;
+  let checkTimeout: number | null = null;
 
   const playMusic = () => {
+    console.log('playMusic');
     musicAudio.currentTime = 0;
     musicAudio.play().catch(() => undefined);
   };
 
+  const checkStopButton = () => {
+    const btn = document.querySelector<HTMLButtonElement>('button#composer-submit-button');
+    if (btn && btn.getAttribute('data-testid') === 'stop-button') {
+      notify = true;
+      // 停止检查，因为已经找到 stop-button
+      if (checkTimeout) {
+        clearInterval(checkTimeout);
+        checkTimeout = null;
+      }
+    }
+  };
+
   const checkButton = () => {
     const btn = document.querySelector<HTMLButtonElement>('button#composer-submit-button');
-    const exists = btn !== null;
 
-    if (exists && !prevExists) {
-      if (btn!.getAttribute('data-testid') === 'stop-button') {
-        notify = true;
+    if (btn && !prevExists) {
+      // 按钮刚出现，启动定时检查
+      checkTimeout = setInterval(checkStopButton, 1000);
+    } else if (!btn && prevExists) {
+      // 按钮消失了
+      if (checkTimeout) {
+        clearInterval(checkTimeout);
+        checkTimeout = null;
       }
-    } else if (!exists && prevExists) {
       if (notify) {
         playMusic();
       }
       notify = false;
     }
 
-    prevExists = exists;
+    prevExists = !!btn;
   };
 
   const observe = () => {
