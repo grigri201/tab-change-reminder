@@ -8,6 +8,8 @@ sampleFunction();
 if (location.hostname === 'chatgpt.com') {
   const audioCtx = new AudioContext();
   let timerId: number | null = null;
+  const streamAudio = new Audio('https://usa9.fastcast4u.com/proxy/jamz?mp=/1');
+  streamAudio.loop = true;
 
   const playBell = () => {
     const osc = audioCtx.createOscillator();
@@ -30,6 +32,34 @@ if (location.hostname === 'chatgpt.com') {
     }, 2000);
   };
 
+  const checkSubmitButton = () => {
+    const btn = document.querySelector<HTMLButtonElement>(
+      'button#composer-submit-button',
+    );
+    if (btn && btn.getAttribute('data-testid') === 'stop-button') {
+      if (streamAudio.paused) {
+        // play may reject if user hasn't interacted with the page
+        streamAudio.play().catch(() => undefined);
+      }
+    } else if (!streamAudio.paused) {
+      streamAudio.pause();
+      streamAudio.currentTime = 0;
+    }
+  };
+
+  const observeSubmitButton = () => {
+    const target = document.body || document.documentElement;
+    if (!target) return;
+    const observer = new MutationObserver(() => checkSubmitButton());
+    observer.observe(target, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['data-testid'],
+    });
+    checkSubmitButton();
+  };
+
   const observe = () => {
     const target = document.body || document.documentElement;
     if (!target) return;
@@ -43,8 +73,12 @@ if (location.hostname === 'chatgpt.com') {
   };
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', observe);
+    document.addEventListener('DOMContentLoaded', () => {
+      observe();
+      observeSubmitButton();
+    });
   } else {
     observe();
+    observeSubmitButton();
   }
 }
