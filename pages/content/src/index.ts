@@ -6,20 +6,17 @@ console.log('content script loaded');
 sampleFunction();
 
 if (location.hostname === 'chatgpt.com') {
-  const audioCtx = new AudioContext();
   let timerId: number | null = null;
   const streamAudio = new Audio('https://usa9.fastcast4u.com/proxy/jamz?mp=/1');
   streamAudio.loop = true;
+  const musicAudio = new Audio(
+    chrome.runtime.getURL('rainy-lofi-city-lofi-music-332746.mp3'),
+  );
+  musicAudio.loop = false;
 
-  const playBell = () => {
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.value = 880;
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.3);
+  const playMusic = () => {
+    musicAudio.currentTime = 0;
+    musicAudio.play().catch(() => undefined);
   };
 
   const resetTimer = () => {
@@ -27,7 +24,7 @@ if (location.hostname === 'chatgpt.com') {
       clearTimeout(timerId);
     }
     timerId = window.setTimeout(() => {
-      playBell();
+      playMusic();
       timerId = null;
     }, 2000);
   };
