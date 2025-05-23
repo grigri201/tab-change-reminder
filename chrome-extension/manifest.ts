@@ -30,21 +30,17 @@ const manifest = {
   version: packageJson.version,
   description: '__MSG_extensionDescription__',
   host_permissions: ['<all_urls>'],
-  permissions: ['storage', 'scripting', 'tabs', 'notifications', 'sidePanel'],
-  options_page: 'options/index.html',
+  permissions: ['storage', 'scripting', 'tabs', 'notifications'],
   background: {
     service_worker: 'background.js',
     type: 'module',
   },
   action: {
     default_popup: 'popup/index.html',
-    default_icon: 'icon-34.png',
-  },
-  chrome_url_overrides: {
-    newtab: 'new-tab/index.html',
+    default_icon: 'icon-idle.png',
   },
   icons: {
-    128: 'icon-128.png',
+    128: 'icon-idle.png',
   },
   content_scripts: [
     {
@@ -53,23 +49,24 @@ const manifest = {
     },
     {
       matches: ['https://chatgpt.com/*'],
-      js: ['content-ui/index.iife.js'],
-    },
-    {
-      matches: ['https://chatgpt.com/*'],
       css: ['content.css'],
     },
   ],
-  devtools_page: 'devtools/index.html',
   web_accessible_resources: [
     {
-      resources: ['*.js', '*.css', '*.svg', '*.mp3', 'icon-128.png', 'icon-34.png'],
+      resources: [
+        '*.js',
+        '*.css',
+        '*.svg',
+        '*.mp3',
+        'icon-128.png',
+        'icon-34.png',
+        'icon-idle.png',
+        'icon-watching.png',
+      ],
       matches: ['*://*/*'],
     },
   ],
-  side_panel: {
-    default_path: 'side-panel/index.html',
-  },
 } satisfies chrome.runtime.ManifestV3;
 
 export default manifest;

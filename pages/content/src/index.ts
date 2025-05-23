@@ -1,5 +1,3 @@
-console.log('content script loaded');
-
 if (location.hostname === 'chatgpt.com') {
   const musicAudio = new Audio(chrome.runtime.getURL('content/notification.mp3'));
   musicAudio.loop = false;
@@ -9,7 +7,6 @@ if (location.hostname === 'chatgpt.com') {
   let checkTimeout: number | null = null;
 
   const playMusic = () => {
-    console.log('playMusic');
     musicAudio.currentTime = 0;
     musicAudio.play().catch(() => undefined);
   };
@@ -18,6 +15,7 @@ if (location.hostname === 'chatgpt.com') {
     const btn = document.querySelector<HTMLButtonElement>('button#composer-submit-button');
     if (btn && btn.getAttribute('data-testid') === 'stop-button') {
       notify = true;
+      chrome.runtime.sendMessage({ action: 'setIcon', path: 'icon-watching.png' });
       // 停止检查，因为已经找到 stop-button
       if (checkTimeout) {
         clearInterval(checkTimeout);
@@ -32,12 +30,14 @@ if (location.hostname === 'chatgpt.com') {
     if (btn && !prevExists) {
       // 按钮刚出现，启动定时检查
       checkTimeout = setInterval(checkStopButton, 1000);
+      chrome.runtime.sendMessage({ action: 'setIcon', path: 'icon-watching.png' });
     } else if (!btn && prevExists) {
       // 按钮消失了
       if (checkTimeout) {
         clearInterval(checkTimeout);
         checkTimeout = null;
       }
+      chrome.runtime.sendMessage({ action: 'setIcon', path: 'icon-idle.png' });
       if (notify) {
         playMusic();
       }
@@ -60,4 +60,7 @@ if (location.hostname === 'chatgpt.com') {
   } else {
     observe();
   }
+
+  // Set initial icon
+  chrome.runtime.sendMessage({ action: 'setIcon', path: 'icon-idle.png' });
 }

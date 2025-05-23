@@ -1,7 +1,7 @@
 {
-  "name": "chrome-extension-boilerplate-react-vite",
+  "name": "chatgpt-watchdog",
   "version": "0.4.3",
-  "description": "chrome extension boilerplate",
+  "description": "chatgpt watchdog",
   "license": "MIT",
   "private": true,
   "sideEffects": false,
