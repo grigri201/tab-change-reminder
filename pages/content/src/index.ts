@@ -7,7 +7,7 @@ sampleFunction();
 
 if (location.hostname === 'chatgpt.com') {
   let timerId: number | null = null;
-  const musicAudio = new Audio(chrome.runtime.getURL('content/rainy-lofi-city-lofi-music-332746.mp3'));
+  const musicAudio = new Audio(chrome.runtime.getURL('content/notification.mp3'));
   musicAudio.loop = false;
 
   const playMusic = () => {
@@ -22,7 +22,7 @@ if (location.hostname === 'chatgpt.com') {
     timerId = window.setTimeout(() => {
       playMusic();
       timerId = null;
-    }, 2000);
+    }, 1000);
   };
 
   const checkSubmitButton = () => {
