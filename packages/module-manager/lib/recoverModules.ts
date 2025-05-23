@@ -2,6 +2,14 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { unzipSync } from 'fflate';
 import { checkbox } from '@inquirer/prompts';
+import { colorLog } from '@extension/dev-utils';
+
+const isDebug = process.env['MODULE_MANAGER_DEBUG'] === 'true';
+const debugLog = (...args: unknown[]) => {
+  if (isDebug) {
+    console.log(...args);
+  }
+};
 
 const pagesPath = path.resolve(import.meta.dirname, '..', '..', '..', 'pages');
 const archivePath = path.resolve(import.meta.dirname, '..', 'archive');
@@ -29,7 +37,7 @@ export default async function recoverModules(manifestObject: chrome.runtime.Mani
   });
 
   if (!choices.length) {
-    console.log('No features to recover');
+    colorLog('No features to recover', 'info');
     process.exit(0);
   }
 
@@ -40,7 +48,7 @@ export default async function recoverModules(manifestObject: chrome.runtime.Mani
   });
 
   if (answers.length === 0) {
-    console.log('No features selected');
+    colorLog('No features selected', 'info');
     process.exit(0);
   }
   if (answers.includes('background')) {
@@ -70,7 +78,7 @@ export default async function recoverModules(manifestObject: chrome.runtime.Mani
   if (answers.includes('options')) {
     recoverOptionsPage(manifestObject);
   }
-  console.log(`Recovered selected features: ${answers.join(', ')}`);
+  colorLog(`Recovered selected features: ${answers.join(', ')}`, 'success');
 }
 
 function recoverBackgroundScript(manifestObject: chrome.runtime.ManifestV3) {

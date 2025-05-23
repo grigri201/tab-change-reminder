@@ -4,6 +4,14 @@ import { rimraf } from 'rimraf';
 import { posix, resolve } from 'node:path';
 import { AsyncZipDeflate, Zip } from 'fflate';
 import fg from 'fast-glob';
+import { colorLog } from '@extension/dev-utils';
+
+const isDebug = process.env['MODULE_MANAGER_DEBUG'] === 'true';
+const debugLog = (...args: unknown[]) => {
+  if (isDebug) {
+    console.log(...args);
+  }
+};
 
 const pagesPath = resolve(import.meta.dirname, '..', '..', '..', 'pages');
 const archivePath = resolve(import.meta.dirname, '..', 'archive');
@@ -31,7 +39,7 @@ export default async function deleteModules(manifestObject: chrome.runtime.Manif
   });
 
   if (!choices.length) {
-    console.log('No features to delete');
+    colorLog('No features to delete', 'info');
     process.exit(0);
   }
 
@@ -42,7 +50,7 @@ export default async function deleteModules(manifestObject: chrome.runtime.Manif
   });
 
   if (answers.length === 0) {
-    console.log('No features selected');
+    colorLog('No features selected', 'info');
     process.exit(0);
   }
   if (!fs.existsSync(archivePath)) {
@@ -75,7 +83,7 @@ export default async function deleteModules(manifestObject: chrome.runtime.Manif
   if (answers.includes('options')) {
     await deleteOptionsPage(manifestObject);
   }
-  console.log(`Deleted selected features: ${answers.join(', ')}`);
+  colorLog(`Deleted selected features: ${answers.join(', ')}`, 'success');
 }
 
 function deleteBackgroundScript(manifestObject: chrome.runtime.ManifestV3) {
@@ -173,7 +181,7 @@ async function zipFolder(path: string, out: string) {
         if (final) {
           output.end();
           promiseResolve();
-          console.log(`Archive created at: ${out} for recovery`);
+          debugLog(`Archive created at: ${out} for recovery`);
         }
       }
     });
@@ -185,7 +193,7 @@ async function zipFolder(path: string, out: string) {
       const absPosixPath = posix.resolve(path, file);
       const relPosixPath = posix.relative(path, absPosixPath);
 
-      console.log(`Achieving file: ${relPosixPath}`);
+      debugLog(`Achieving file: ${relPosixPath}`);
       streamFileToZip(
         absPath,
         relPosixPath,
